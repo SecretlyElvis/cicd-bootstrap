@@ -1,0 +1,78 @@
+#!/bin/sh
+###########################################
+#   T E R R A F O R M   L A U N C H E R   #
+#                                         #
+# Script standardizes Terraform execution #
+# with command-line arguments.  Designed  #
+# for use in Docker containers or via CLI #
+###########################################
+
+CMD=${1:---help}
+ENV=${2:-MVP}
+
+# Use/overwrite existing "*.plan" file if any, otherwise generate
+PLAN_FILE=$(find . -name "*.plan" | head -n 1)
+if [ $PLAN_FILE ]; then
+   echo "Found existing PLAN file: '${PLAN_FILE}'.\n"
+else
+   PID=$$
+   PLAN_FILE="./peo-${PID}.plan"
+fi
+
+# Uncomment the following lines to enable debugging
+# export TF_LOG=DEBUG
+# export TF_LOG_PATH=./tflog
+
+if [ "$#" -ne 2 ]; then
+    echo "
+        Usage:
+          $0 <Terraform command> <Target AWS Environment>
+
+	Where:
+	   * Terraform command == init|plan|apply|destroy
+	   * Target AWS Account == DEV|PRD
+	
+        Example: 
+         $0 init DEV"
+    exit 0
+fi
+
+echo "Execution Start..."
+echo "- Terraform command:  $CMD"
+echo "- Target Environment:  $ENV"
+echo ""
+
+case $CMD in
+    init)
+	terraform init -input=false -backend=true -var-file=./$ENV/$ENV.tfvars -backend-config=./$ENV/$ENV-backend.tfvars
+        ;;
+
+    plan)
+	terraform plan -var-file=./$ENV/$ENV.tfvars -out=$PLAN_FILE
+	;;
+
+    apply)
+    echo "Applying PLAN file: '${PLAN_FILE}'...\n"
+	terraform apply -auto-approve $PLAN_FILE
+	;;
+
+    destroy)
+	terraform destroy -auto-approve -var-file=./$ENV/$ENV.tfvars
+    echo "Deleting plan files..."
+	rm -v ./*.plan
+    echo "Complete."
+	;;
+
+    *)
+    echo """
+Currently only init|plan|apply|destroy are supported by this script.  For other tasks, use 'terraform' command directly.
+
+Example:
+terraform show -json <plan file> | jq .
+\n"""
+    ;;
+
+esac
+
+echo "'${0}' Complete"
+exit 0
