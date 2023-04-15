@@ -1,5 +1,7 @@
 # Overview
 
+![Base Architecture](images/Base-Architecture.jpg)
+
 This repository contains Terraform definitions for repeated AWS infrastructure to be deployed across multiple accounts.    
 
 ## Structure of Contents
