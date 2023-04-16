@@ -1,14 +1,20 @@
 ## Terraform State Variables PEO DEV Account (667873832206)
 
 # Role to assume for execution of infrastructure actions
-role_arn = "arn:aws:iam::123456789012:role/TerraformDeployRole"
+role_arn = "arn:aws:iam::667873832206:role/OrganizationAccountAccessRole"
 
 # Default Region
 region = "ap-southeast-2"
 
+# Hosted Zone Name
+hz_name = "667873832206.accounts.gentrack.io"
+
+# Wildcard Certificate ARN
+cert_arn = "arn:aws:acm:ap-southeast-2:667873832206:certificate/88fbdb44-26d4-4c8b-ae48-470dfd2ea8f8"
+
 # Naming Components
 application           = "cicd"                     
-tenant                = "nrl"                     
+tenant                = "peo"                     
 environment           = "dev" 
 
 ###################
@@ -35,11 +41,20 @@ vpc_defs = [
         access_point = "/efs/jenkins_dev"
 
         docker_image = "jenkins/jenkins:lts-jdk11"
-        app_port = 8080
+        app_ports = [ 8080 ]
+        subdomains = [ "jenkinsdev" ]
         health_check_path = "/login"
         container_mount = "/var/jenkins_home"
+        port_mappings = [
+            {
+            containerPort = 8080
+            hostPort      = 8080
+            }
+        ]
+        port_tg = {
+            8080 = 0
+        }
 
-        internal_facing = false
     },
     {
         # NEXUS VPC and APP
@@ -57,11 +72,25 @@ vpc_defs = [
         access_point = "/efs/nexus"
 
         docker_image = "sonatype/nexus3:latest"
-        app_port = 8081
+        app_ports = [ 8081, 8082 ]
+        subdomains = [ "nexus", "docker" ]
         health_check_path = "/service/rest/v1/status" 
         container_mount = "/opt/sonatype/sonatype-work/nexus3"
-
-        internal_facing = true     
+        port_mappings = [
+            {
+            containerPort = 8081
+            hostPort      = 8081
+            },
+            {
+            containerPort = 8082
+            hostPort      = 8082
+            }            
+        ]
+        port_tg = {
+            8081 = 0
+            8082 = 1
+        }
+   
     },
 #    {
 #        # JENKINS PRD VPC and APP
@@ -79,11 +108,20 @@ vpc_defs = [
 #        access_point = "/efs/jenkins_prd"
 #
 #        docker_image = "jenkins/jenkins:lts-jdk11"
-#        app_port = 8080
+#        app_ports = [ 8080 ]
+#        subdomains = [ "jenkinsprd" ]
+#        alt_port = -1
 #        health_check_path = "/login"
 #        container_mount = "/var/jenkins_home"
-#
-#        internal_facing = false
+#        port_mappings = [
+#            {
+#            containerPort = 8080
+#            hostPort      = 8080
+#            }
+#        ]
+#        port_tg = {
+#            8080 = 0
+#        }
 #    }    
 ]
 
@@ -93,7 +131,7 @@ vpc_defs = [
 
 peering_pairs = {
 
-    jdev_to_nexus = [0, 1]
+#    jdev_to_nexus = [0, 1]
 #    jprd_to_nexus = [2, 1]
 
 }    

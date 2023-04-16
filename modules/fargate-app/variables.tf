@@ -3,9 +3,20 @@ variable "docker_image" {
   type = string
 }
 
-variable "app_port" {
-  description = "Container Port for Application Listener"
-  type = string
+variable "app_ports" {
+  description = "Host/Container Ports for ALB Target Groups"
+  type = list
+}
+
+variable "port_mappings" {
+  description = "List of mappings from Host Port -> Container Port"
+  type = list
+  
+}
+
+variable "port_tg" {
+  description = "Mappings of Host/Container Ports to Target Group List Index"
+  type = map
 }
 
 variable "container_mount" {
@@ -53,6 +64,23 @@ variable "shortname" {
   description = "Distinct Identifier for Fargate Application"
   type = string
   default = ""
+}
+
+## Hosted Zone Name to Pre-pend with Subdomains
+variable "hz_name" {
+  description = "Name of Hosted Zone in Which to Create Subdomain Records"
+  type = string
+  
+}
+
+variable "cert_arn" {
+  description = "ARN of Wildcard Certificate for the Account"
+  type = string
+}
+
+variable "subdomains" {
+  description = "List of Subdomains to Pre-pend to Hosted Zone Name as Alias Records"
+  type = list(string)
 }
 
 ## Common Tags for All Infrastructure Components

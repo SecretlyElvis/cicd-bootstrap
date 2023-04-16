@@ -111,17 +111,28 @@ module "app-standup" {
   
   count = length(var.vpc_defs)
 
+  # ECS
   docker_image = var.vpc_defs[count.index].docker_image
-  app_port = var.vpc_defs[count.index].app_port
+  app_ports = var.vpc_defs[count.index].app_ports
   container_mount = var.vpc_defs[count.index].container_mount
+  port_mappings = var.vpc_defs[count.index].port_mappings
+  port_tg = var.vpc_defs[count.index].port_tg
   health_check_path = var.vpc_defs[count.index].health_check_path
 
+
+  # EFS
   file_system_id = module.efs-standup[count.index].file_system_id
   access_point_id = module.efs-standup[count.index].access_point_id
 
+  # ALB
   default_security_group_id = module.vpc-standup[count.index].default_security_group_id
   public_subnets = module.vpc-standup[count.index].public_subnets
   vpc_id      = module.vpc-standup[count.index].vpc_id
+
+  # Route 53
+  hz_name = var.hz_name
+  cert_arn = var.cert_arn
+  subdomains = var.vpc_defs[count.index].subdomains
 
   common_tags = local.common_tags
   basename = join("-", [ local.basename, var.vpc_defs[count.index].name ])

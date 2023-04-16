@@ -21,6 +21,7 @@ variable "peering_pairs" {
   type = map
 }
 
+## Common Tags and Resource Name Elements
 variable "application" {
   description = "Application Identifier"
   type = string
@@ -37,6 +38,18 @@ variable "environment" {
   description = "Environment Identifier"
   type = string
   default = ""
+}
+
+variable "hz_name" {
+  description = "Name of Hosted Zone in Which to Create Subdomain Records"
+  type = string
+  
+}
+
+variable "cert_arn" {
+  description = "ARN of Wildcard Certificate for the Account"
+  type = string
+  
 }
 
 ## Common Tags for All Infrastructure Components
