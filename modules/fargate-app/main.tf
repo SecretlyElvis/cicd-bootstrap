@@ -36,7 +36,7 @@ resource "aws_ecs_task_definition" "task-def" {
   family                   = var.shortname
   requires_compatibilities = ["FARGATE"]
   network_mode             = "awsvpc"
-  cpu                      = "2 vCPU"
+  cpu                      = 2048
   memory                   = 4096
  
   container_definitions    = jsonencode([
