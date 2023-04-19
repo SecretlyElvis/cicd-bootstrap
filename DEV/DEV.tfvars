@@ -40,7 +40,7 @@ vpc_defs = [
 
         access_point = "/efs/jenkins_dev"
 
-        docker_image = "jenkins/jenkins:lts-jdk11"
+        docker_image = "jenkins/jenkins:2.400-jdk11"
         app_ports = [ 8080 ]
         subdomains = [ "jenkinsdev" ]
         health_check_path = "/login"
@@ -178,3 +178,4 @@ common_tags = {}
 #  - 10.16.5.160/27	
 #  - 10.16.5.192/27		
 #  - 10.16.5.224/27
+
