@@ -31,6 +31,8 @@ resource "aws_ecs_cluster_capacity_providers" "cap-prv-def" {
 
 #######################################
 ## Fargate Task Definition (with mount)
+# taskRoleArn = var.task_role ? aws_iam_role.fargate-task-role[0].arn : ""
+
 
 resource "aws_ecs_task_definition" "task-def" {
   family                   = var.shortname
@@ -106,9 +108,9 @@ resource "aws_ecs_service" "service-def" {
   }
 
   network_configuration {
-    subnets            = var.public_subnets
+    subnets            = var.private_subnets
     security_groups    = [var.default_security_group_id]
-    assign_public_ip = true
+    assign_public_ip = false
   }
 
   tags = merge(

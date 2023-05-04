@@ -45,6 +45,11 @@ variable "default_security_group_id" {
 }
 
 variable "public_subnets" {
+  description = "Subnets for Application Load Balancer Deployment"
+  type = list
+}
+
+variable "private_subnets" {
   description = "Subnets for Fargate Application Deployment"
   type = list
 }

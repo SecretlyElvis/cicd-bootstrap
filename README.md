@@ -2,7 +2,7 @@
 
 ![Base Architecture](images/Base-Architecture.jpg)
 
-This repository contains Terraform definitions for repeated AWS infrastructure to be deployed across multiple accounts.    
+This repository contains Terraform definitions for a configurable, fully-functional CI/CD framework including two Jenkins Environments (DEV and PRD) sharing a central Nexus Artifact Repository for Docker Tooling Images.    
 
 ## Environment Definitions
 
@@ -30,6 +30,19 @@ role_arn = "arn:aws:iam::667873832206:role/OrganizationAccountAccessRole"
 ```
 
 **DEV.tfvars**
+
+_Name/Tag Tokens:_
+- `tenant`: Example: `peo`
+- `application`:  Example: `cicd`
+- `environment`: Example: `dev`
+
+_Platform Configurations_
+- `hz_name`: Hosting Zone on which to pre-pend subdomains for individual services (Example: `667873832206.accounts.gentrack.io`)
+- `cert_arn`: Wildcard SSL certificate to associate with ALB ingress parths (Example: `arn:aws:acm:ap-southeast-2:667873832206:certificate/88fbdb44-26d4-4c8b-ae48-470dfd2ea8f8`) 
+- `create_iam`: True/False flag to trigger creation of IAM Users for Jenkins Master, Jenkins Slave and a sample deployment role
+- `jenkins_master_policy`: IAM Policy to be attached to Jenkins Master User
+- `assumable_roles`:  List of role ARNs that can be assumed by the Jenkins Slave IAM User
+- `deployment_role_policy`:  IAM Policy to be attached to the sample deployment role
 
 - `vpc_defs`: list of maps describing one or more VPC definitions
 
@@ -149,6 +162,8 @@ The repository is designed to be deployed from the command line on a local machi
 * AWS CLI Credentials for an IAM user that has permissions to assume roles defined in the target account
 * The role in the target account must have a trust relationship with the IAM user defined above
 * An S3 bucket and DynamoDB table in the target account for Terraform state
+* Route 53 Hosted Zone
+* Wildcard cerificate for Hosted Zone to cover all subdomains
 * Terraform and AWS CLI installed on the local machine
 * [Optional] Docker installed if using the 'terraform-deploy' image rather than local tooling
 

@@ -95,7 +95,7 @@ module "efs-standup" {
   count = length(var.vpc_defs) 
 
   access_point = var.vpc_defs[count.index].access_point
-  public_subnets = module.vpc-standup[count.index].public_subnets
+  private_subnets = module.vpc-standup[count.index].private_subnets
 
   common_tags = local.common_tags
   basename = join("-", [ local.basename, var.vpc_defs[count.index].name ])
@@ -118,7 +118,7 @@ module "app-standup" {
   port_mappings = var.vpc_defs[count.index].port_mappings
   port_tg = var.vpc_defs[count.index].port_tg
   health_check_path = var.vpc_defs[count.index].health_check_path
-
+  private_subnets = module.vpc-standup[count.index].private_subnets
 
   # EFS
   file_system_id = module.efs-standup[count.index].file_system_id
@@ -137,5 +137,24 @@ module "app-standup" {
   common_tags = local.common_tags
   basename = join("-", [ local.basename, var.vpc_defs[count.index].name ])
   shortname = var.vpc_defs[count.index].name
+
+}
+
+#######################################################################################
+## Create IAM Elements for Jenkins (Instance Profile, IAM User for Slave Agent Standup)
+## Note; TF doesn't suppert 'if-then-else' so this is the poor man's version
+
+module "iam-standup" {
+
+  source = "./modules/iam-elements"
+  
+  count = var.create_iam ? 1 : 0
+
+  assumable_roles = var.assumable_roles
+  deployment_role_policy = var.deployment_role_policy
+  jenkins_master_policy = var.jenkins_master_policy
+  
+  common_tags = local.common_tags
+  basename = local.basename
 
 }

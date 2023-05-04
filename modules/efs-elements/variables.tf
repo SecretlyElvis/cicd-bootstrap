@@ -3,7 +3,7 @@ variable "access_point" {
     type = string
 }
 
-variable "public_subnets" {
+variable "private_subnets" {
     description = "Subnets for creation of EFS mount targets"
     type = list
     default = []

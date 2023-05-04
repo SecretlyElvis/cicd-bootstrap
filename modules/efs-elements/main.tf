@@ -45,10 +45,10 @@ resource "aws_efs_access_point" "efs-file-path" {
 ## Create Mount Targets for Each Subnet in the VPC
 resource "aws_efs_mount_target" "mt" {
  
-    count = length(var.public_subnets)
+    count = length(var.private_subnets)
  
     file_system_id = aws_efs_file_system.efs-instance.id
-    subnet_id      = var.public_subnets[count.index]
+    subnet_id      = var.private_subnets[count.index]
  
     # security_groups = TODO
 }
