@@ -109,7 +109,7 @@ resource "aws_ecs_service" "service-def" {
 
   network_configuration {
     subnets            = var.private_subnets
-    security_groups    = [var.default_security_group_id]
+    security_groups    = [var.default_security_group_id]  # 'fargate' Security Group
     assign_public_ip = false
   }
 

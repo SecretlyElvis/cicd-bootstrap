@@ -1,7 +1,7 @@
 ## Terraform State Variables PEO DEV Account (667873832206)
 
 # Role to assume for execution of infrastructure actions
-role_arn = "arn:aws:iam::667873832206:role/OrganizationAccountAccessRole"
+role_arn = "arn:aws:iam::339285943866:role/TF-Deploy"
 
 # Default Region
 region = "ap-southeast-2"
@@ -27,10 +27,9 @@ create_iam    = true
 ## 2) Nexus
 ## 3) Jenkins PRD
 
-stack_defs = [ 
+vpc_defs = [ 
     {
-        # JENKINS DEV APP STACK
-        app_type = "jenkins"
+        # JENKINS DEV VPC and APP
         name = "jdev"
         cidr = "10.16.3.0/24"
 
@@ -53,11 +52,7 @@ stack_defs = [
             {
             containerPort = 8080
             hostPort      = 8080
-            },
-            {
-            containerPort = 50000
-            hostPort      = 50000
-            }            
+            }
         ]
         port_tg = {
             8080 = 0
@@ -65,8 +60,7 @@ stack_defs = [
 
     },
     {
-        # NEXUS APP STACK
-        app_type = "nexus"
+        # NEXUS VPC and APP
         name = "nxs"        
         cidr = "10.16.4.0/24"
 
@@ -102,8 +96,7 @@ stack_defs = [
    
     },
 #    {
-#        # JENKINS PRD APP STACK
-#        app_type = "jenkins"
+#        # JENKINS PRD VPC and APP
 #        name = "jprd"
 #        cidr = "10.16.5.0/24"
 #
@@ -137,7 +130,7 @@ stack_defs = [
 
 #######################################################################
 ## VPC Peering Connections (Jenkins DEV -> Nexus, Jenkins PRD -> Nexus)
-## Refs to index values in 'stack_defs' array
+## Refs to index values in 'vpc_defs' array
 
 peering_pairs = {
 

@@ -50,5 +50,5 @@ resource "aws_efs_mount_target" "mt" {
     file_system_id = aws_efs_file_system.efs-instance.id
     subnet_id      = var.private_subnets[count.index]
  
-    # security_groups = TODO
+    security_groups = [ var.efs_sg_id ]
 }

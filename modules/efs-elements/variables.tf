@@ -9,6 +9,12 @@ variable "private_subnets" {
     default = []
 }
 
+variable "efs_sg_id" {
+    description = "ID for the EFS Security Group"
+    type = string
+    default = ""
+}
+
 variable "basename" {
     description = "Prefix for names associated with each component"
     type = string

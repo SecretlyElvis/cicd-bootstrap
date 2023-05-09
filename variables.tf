@@ -10,7 +10,7 @@ variable "role_arn" {
 }
 
 ## VPC Configuration
-variable "vpc_defs" {
+variable "stack_defs" {
   description = "List of VPC definitions to provision"
   type = list
 }

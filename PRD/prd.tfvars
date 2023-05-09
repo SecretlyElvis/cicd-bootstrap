@@ -8,7 +8,7 @@ region = "ap-southeast-2"
 
 ## VPC Configuration
 
-vpc_defs = [ 
+stack_defs = [ 
     {
         name = "prd-jenkins-dev"
         cidr = "10.16.3.0/24"

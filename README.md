@@ -1,6 +1,8 @@
 # Overview
 
-![Base Architecture](images/Base-Architecture.jpg)
+## Core Architecture
+
+![Core Architecture](images/Bootstrap-Core-Arch.v1.jpg)
 
 This repository contains Terraform definitions for a configurable, fully-functional CI/CD framework including two Jenkins Environments (DEV and PRD) sharing a central Nexus Artifact Repository for Docker Tooling Images.    
 
@@ -44,7 +46,7 @@ _Platform Configurations_
 - `assumable_roles`:  List of role ARNs that can be assumed by the Jenkins Slave IAM User
 - `deployment_role_policy`:  IAM Policy to be attached to the sample deployment role
 
-- `vpc_defs`: list of maps describing one or more VPC definitions
+- `stack_defs`: list of maps describing one or more VPC definitions
 
 VPC definition data structure:
 
@@ -78,7 +80,7 @@ VPC definition data structure:
 _Example:_
 
 ```
-vpc_defs = [ 
+stack_defs = [ 
   {
       # JENKINS DEV VPC and APP
       name = "jdev"
@@ -187,3 +189,9 @@ Example of complete deploy sequence:
    ./tf-run plan DEV
    ./tf-run apply DEV
 ```
+
+# Appendix
+
+## Network Interconnectivity
+
+See README file in `modules/security-groups` for Network Interconnectivity Reference diagram.
