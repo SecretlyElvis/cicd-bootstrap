@@ -1,3 +1,3 @@
 # Network Interconnectivity Reference
 
-![Network Interconnectivity](images/Network-Interconnection.v1.jpg)
+![Network Interconnectivity](images/Network-Interconnection.v2.jpg)

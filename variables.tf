@@ -49,7 +49,6 @@ variable "hz_name" {
 variable "cert_arn" {
   description = "ARN of Wildcard Certificate for the Account"
   type = string
-  
 }
 
 ## IAM Element Variables
@@ -58,6 +57,14 @@ variable "create_iam" {
     description = "Flag Whether to Create IAM Components (IAM User for EC2 Agent, Instance Profile, etc.) - Not Retuired for NExus"
     type = bool
     default = false
+}
+
+## List of IPs to Whitelist for Load Balancer Ingress
+
+variable "whitelist_ips" {
+  description = "List of External IPs to Whitelist in Load Balancer Security Group Ingress Rules"
+  type = list
+  default = []
 }
 
 variable "assumable_roles" {

@@ -109,7 +109,7 @@ resource "aws_ecs_service" "service-def" {
 
   network_configuration {
     subnets            = var.private_subnets
-    security_groups    = [var.default_security_group_id]  # 'fargate' Security Group
+    security_groups    = [var.ecs_sg_id]
     assign_public_ip = false
   }
 
@@ -133,7 +133,7 @@ resource "aws_lb" "alb-def" {
   name               = join("-", [ var.basename, "alb" ])
   internal           = false
   load_balancer_type = "application"
-  security_groups    = [var.default_security_group_id]
+  security_groups    = [var.alb_sg_id]
   subnets            = var.public_subnets
 
   enable_deletion_protection = false

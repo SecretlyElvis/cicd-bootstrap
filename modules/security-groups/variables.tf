@@ -19,6 +19,11 @@ variable "app_ports" {
   type = list
 }
 
+variable "whitelist_ips" {
+  description = "List of IP addresses for Load Balancer whitelisting"
+  type = list
+}
+
 variable "shortname" {
   description = "Distinct Identifier for Fargate Application"
   type = string

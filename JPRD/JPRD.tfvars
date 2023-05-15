@@ -1,7 +1,7 @@
 ## Terraform State Variables PEO DEV Account (667873832206)
 
 # Role to assume for execution of infrastructure actions
-role_arn = "arn:aws:iam::339285943866:role/TF-Deploy"
+role_arn = "arn:aws:iam::667873832206:role/OrganizationAccountAccessRole"
 
 # Default Region
 region = "ap-southeast-2"
@@ -14,8 +14,14 @@ cert_arn = "arn:aws:acm:ap-southeast-2:667873832206:certificate/88fbdb44-26d4-4c
 
 # Naming Components
 application   = "cicd"                     
-tenant        = "peo"                     
+tenant        = "corp"                     
 environment   = "dev" 
+
+# List of IPs to Whitelist for Load Balancer Ingress
+
+whitelist_ips = [
+    "0.0.0.0/0", # TEMP: Open to World for Testing -- Add Jenkins NAT Gateway EIPs to Nexus Stack in Production
+]
 
 # Create IAM EC2 Agent Policy, Instance Profile
 create_iam    = true
@@ -27,23 +33,24 @@ create_iam    = true
 ## 2) Nexus
 ## 3) Jenkins PRD
 
-vpc_defs = [ 
+stack_defs = [ 
     {
-        # JENKINS DEV VPC and APP
-        name = "jdev"
-        cidr = "10.16.3.0/24"
+        # JENKINS DEV APP STACK
+        app_type = "jenkins"
+        name = "jprd"
+        cidr = "10.16.5.0/24"
 
         azs             = ["ap-southeast-2a", "ap-southeast-2b"]
-        private_subnets = ["10.16.3.0/27", "10.16.3.32/27"]
-        public_subnets  = ["10.16.3.128/27", "10.16.3.160/27"]
+        private_subnets = ["10.16.5.0/27", "10.16.5.32/27"]
+        public_subnets  = ["10.16.5.128/27", "10.16.5.160/27"]
 
         enable_nat_gateway = true
         single_nat_gateway = true
         one_nat_gateway_per_az = false
 
-        access_point = "/efs/jenkins_dev"
+        access_point = "/efs/jenkins_prdv"
 
-        docker_image = "jenkins/jenkins:2.400-jdk11"
+        docker_image = "jenkins/jenkins:2.404-jdk11"
         app_ports = [ 8080 ]
         subdomains = [ "jenkinsdev" ]
         health_check_path = "/login"
@@ -52,92 +59,24 @@ vpc_defs = [
             {
             containerPort = 8080
             hostPort      = 8080
-            }
+            },
+            {
+            containerPort = 50000
+            hostPort      = 50000
+            }            
         ]
         port_tg = {
             8080 = 0
         }
 
-    },
-    {
-        # NEXUS VPC and APP
-        name = "nxs"        
-        cidr = "10.16.4.0/24"
-
-        azs             = ["ap-southeast-2b", "ap-southeast-2c"]
-        private_subnets = ["10.16.4.0/27", "10.16.4.32/27"]
-        public_subnets  = ["10.16.4.128/27", "10.16.4.160/27"]
-
-        enable_nat_gateway = true 
-        single_nat_gateway = true 
-        one_nat_gateway_per_az = false
-
-        access_point = "/efs/nexus"
-
-        docker_image = "sonatype/nexus3:latest"
-        app_ports = [ 8081, 8082 ]
-        subdomains = [ "nexus", "docker" ]
-        health_check_path = "/service/rest/v1/status" 
-        container_mount = "/opt/sonatype/sonatype-work/nexus3"
-        port_mappings = [
-            {
-            containerPort = 8081
-            hostPort      = 8081
-            },
-            {
-            containerPort = 8082
-            hostPort      = 8082
-            }            
-        ]
-        port_tg = {
-            8081 = 0
-            8082 = 1
-        }
-   
-    },
-#    {
-#        # JENKINS PRD VPC and APP
-#        name = "jprd"
-#        cidr = "10.16.5.0/24"
-#
-#        azs             = ["ap-southeast-2a", "ap-southeast-2c"]
-#        private_subnets = ["10.16.5.0/27", "10.16.5.32/27"]
-#        public_subnets  = ["10.16.5.128/27", "10.16.5.160/27"]
-#
-#        enable_nat_gateway = true
-#        single_nat_gateway = true
-#        one_nat_gateway_per_az = false
-#
-#        access_point = "/efs/jenkins_prd"
-#
-#        docker_image = "jenkins/jenkins:lts-jdk11"
-#        app_ports = [ 8080 ]
-#        subdomains = [ "jenkinsprd" ]
-#        alt_port = -1
-#        health_check_path = "/login"
-#        container_mount = "/var/jenkins_home"
-#        port_mappings = [
-#            {
-#            containerPort = 8080
-#            hostPort      = 8080
-#            }
-#        ]
-#        port_tg = {
-#            8080 = 0
-#        }
-#    }    
+    },   
 ]
 
 #######################################################################
 ## VPC Peering Connections (Jenkins DEV -> Nexus, Jenkins PRD -> Nexus)
-## Refs to index values in 'vpc_defs' array
+## Refs to index values in 'stack_defs' array
 
-peering_pairs = {
-
-#    jdev_to_nexus = [0, 1]
-#    jprd_to_nexus = [2, 1]
-
-}    
+peering_pairs = {}    
 
 #################
 ## IAM Components

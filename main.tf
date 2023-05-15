@@ -96,6 +96,7 @@ module "sg-defs" {
   vpc_id = module.vpc-standup[count.index].vpc_id
   vpc_cidr = var.stack_defs[count.index].cidr 
   app_ports = var.stack_defs[count.index].app_ports
+  whitelist_ips = local.whitelist_ips
 
   app_type = var.stack_defs[count.index].app_type
   shortname = var.stack_defs[count.index].name
@@ -139,6 +140,7 @@ module "app-standup" {
   port_tg = var.stack_defs[count.index].port_tg
   health_check_path = var.stack_defs[count.index].health_check_path
   private_subnets = module.vpc-standup[count.index].private_subnets
+  ecs_sg_id = module.sg-defs[count.index].ecs_sg_id
 
   # EFS
   file_system_id = module.efs-standup[count.index].file_system_id
@@ -146,6 +148,7 @@ module "app-standup" {
 
   # ALB
   default_security_group_id = module.vpc-standup[count.index].default_security_group_id
+  alb_sg_id = module.sg-defs[count.index].alb_sg_id
   public_subnets = module.vpc-standup[count.index].public_subnets
   vpc_id = module.vpc-standup[count.index].vpc_id
 

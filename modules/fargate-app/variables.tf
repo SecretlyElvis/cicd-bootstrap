@@ -39,6 +39,16 @@ variable "access_point_id" {
   type = string
 }
 
+variable "ecs_sg_id" {
+  description = "Security Group for ECS Service/Fargate"
+  type = string  
+}
+
+variable "alb_sg_id" {
+  description = "Security Group for Application Load Balancer"
+  type = string  
+}
+
 variable "default_security_group_id" {
   description = "Security Group to Assign to Fargate Application"
   type = string  

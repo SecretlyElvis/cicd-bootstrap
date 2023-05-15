@@ -17,6 +17,14 @@ application   = "cicd"
 tenant        = "peo"                     
 environment   = "dev" 
 
+# List of IPs to Whitelist for Load Balancer Ingress
+
+whitelist_ips = [
+    "13.238.198.206/32", # Nexus EIP
+    "54.206.162.82/32", # Jenkins DEV EIP
+    "101.98.162.108/32", # TEMP: Dan's Home Office
+]
+
 # Create IAM EC2 Agent Policy, Instance Profile
 create_iam    = true
 
@@ -32,11 +40,11 @@ stack_defs = [
         # JENKINS DEV APP STACK
         app_type = "jenkins"
         name = "jdev"
-        cidr = "10.16.3.0/24"
+        cidr = "10.16.0.0/24"
 
         azs             = ["ap-southeast-2a", "ap-southeast-2b"]
-        private_subnets = ["10.16.3.0/27", "10.16.3.32/27"]
-        public_subnets  = ["10.16.3.128/27", "10.16.3.160/27"]
+        private_subnets = ["10.16.0.0/27", "10.16.0.32/27"]
+        public_subnets  = ["10.16.0.128/27", "10.16.0.160/27"]
 
         enable_nat_gateway = true
         single_nat_gateway = true
@@ -68,11 +76,11 @@ stack_defs = [
         # NEXUS APP STACK
         app_type = "nexus"
         name = "nxs"        
-        cidr = "10.16.4.0/24"
+        cidr = "10.16.1.0/24"
 
         azs             = ["ap-southeast-2b", "ap-southeast-2c"]
-        private_subnets = ["10.16.4.0/27", "10.16.4.32/27"]
-        public_subnets  = ["10.16.4.128/27", "10.16.4.160/27"]
+        private_subnets = ["10.16.1.0/27", "10.16.1.32/27"]
+        public_subnets  = ["10.16.1.128/27", "10.16.1.160/27"]
 
         enable_nat_gateway = true 
         single_nat_gateway = true 
@@ -105,11 +113,11 @@ stack_defs = [
 #        # JENKINS PRD APP STACK
 #        app_type = "jenkins"
 #        name = "jprd"
-#        cidr = "10.16.5.0/24"
+#        cidr = "10.16.2.0/24"
 #
 #        azs             = ["ap-southeast-2a", "ap-southeast-2c"]
-#        private_subnets = ["10.16.5.0/27", "10.16.5.32/27"]
-#        public_subnets  = ["10.16.5.128/27", "10.16.5.160/27"]
+#        private_subnets = ["10.16.2.0/27", "10.16.2.32/27"]
+#        public_subnets  = ["10.16.2.128/27", "10.16.2.160/27"]
 #
 #        enable_nat_gateway = true
 #        single_nat_gateway = true

@@ -1,19 +1,19 @@
 output "efs_sg_id" {
-  description = "The ID of the EFS instance"
+  description = "The ID of the EFS Security Group"
   value       = try(aws_security_group.efs.id, "")
 }
 
-#output "file_system_arn" {
-#  description = "The ARN of the EFS instance"
-#  value       = try(aws_efs_file_system.efs-instance.arn, "")
-#}
+output "ecs_sg_id" {
+  description = "The ID of the ECS/Fargate Security Group"
+  value       = try(aws_security_group.ecs.id, "")
+}
 
-#output "access_point_id" {
-#  description = "The ID of the Access Point"
-#  value       = try(aws_efs_access_point.efs-file-path.id, "")
-#}
+output "alb_sg_id" {
+  description = "The ID of the Application Load Balancer Security Group"
+  value       = try(aws_security_group.alb.id, "")
+}
 
-#output "access_point_arn" {
-#  description = "The ARN of the Access Point"
-#  value       = try(aws_efs_access_point.efs-file-path.arn, "")
-#}
+output "slv_sg_id" {
+  description = "The ID of the Jenkins EC2 Slave Agent Security Group"
+  value       = try(aws_security_group.slv[0].id, "")
+}
