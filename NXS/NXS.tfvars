@@ -1,7 +1,7 @@
 ## Terraform State Variables PEO DEV Account (667873832206)
 
 # Role to assume for execution of infrastructure actions
-role_arn = "arn:aws:iam::667873832206:role/OrganizationAccountAccessRole"
+role_arn = "arn:aws:iam::339285943866:role/TF-Deploy"
 
 # Default Region
 region = "ap-southeast-2"

@@ -1,7 +1,7 @@
 ## Terraform State Variables PEO DEV Account (667873832206)
 
 # Role to assume for execution of infrastructure actions
-role_arn = "arn:aws:iam::667873832206:role/OrganizationAccountAccessRole"
+role_arn = "arn:aws:iam::339285943866:role/TF-Deploy"
 
 # Default Region
 region = "ap-southeast-2"
@@ -20,9 +20,7 @@ environment   = "dev"
 # List of IPs to Whitelist for Load Balancer Ingress
 
 whitelist_ips = [
-    "13.238.198.206/32", # Nexus EIP
-    "54.206.162.82/32", # Jenkins DEV EIP
-    "101.98.162.108/32", # TEMP: Dan's Home Office
+    "0.0.0.0/0", # TEMP: Allow All from World for Testing
 ]
 
 # Create IAM EC2 Agent Policy, Instance Profile
