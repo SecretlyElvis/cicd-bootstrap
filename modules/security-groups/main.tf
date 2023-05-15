@@ -19,7 +19,7 @@ resource "aws_security_group" "alb" {
 }
 
 # ALB Ingress: 80 and 443 from Whitelist IPs (port 80 is redirected to 443)
-resource "aws_vpc_security_group_ingress_rule" "alb-ingress-https" {
+resource "aws_vpc_security_group_ingress_rule" "alb-ingress-http" {
   
   count = length(var.whitelist_ips)
 
