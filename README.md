@@ -8,12 +8,16 @@ This repository contains Terraform definitions for a configurable, fully-functio
 
 ## Environment Definitions
 
-Platforms are configured by creating a subdirectory (e.g. 'DEV') containing two primary sets of values.  The prefix for each filename must match the directory.  Required files:
+Platforms are configured by creating a subdirectory (e.g. 'JDEV') containing two primary sets of values:
+1) a backend configuration defining an S3 bucket, DynamoDB table and state file 'key'
+2) configuration for either a Jenkins or Nexus applicaton stack
 
-- `DEV-backend.tfvars`: account-specific configuration
-- `DEV.tfvars`: platform component configuration
+The prefix for each filename must match the directory.  Example filenames:
 
-**DEV-backend.tfvars**
+- `JDEV-backend.tfvars`: account-specific configuration
+- `JDEV.tfvars`: stack component configuration
+
+**JDEV-backend.tfvars**
 
 - `bucket` = S3 Bucket for Terraform State
 - `key` = Name of state file (must be unique per platform)
@@ -24,136 +28,171 @@ Platforms are configured by creating a subdirectory (e.g. 'DEV') containing two 
 _Example:_
 
 ```
-bucket = "peodev-667873832206-tf-state"
-key = "MVP-Jenkins-Platform.tfstate"
-dynamodb_table = "peodev-667873832206-tf-lock-table"
+bucket = "tools-405711654092-tf-state"
+key = "jenkins/Jenkins-DEV-Stack.tfstate"
+dynamodb_table = "tools-405711654092-tf-lock-table"
 region = "ap-southeast-2"
-role_arn = "arn:aws:iam::667873832206:role/OrganizationAccountAccessRole"
+role_arn = "arn:aws:iam::405711654092:role/OrganizationAccountAccessRole"
 ```
 
-**DEV.tfvars**
+**JDEV.tfvars**
 
 _Name/Tag Tokens:_
+
 - `tenant`: Example: `peo`
 - `application`:  Example: `cicd`
-- `environment`: Example: `dev`
+- `environment`: Example: `prd`
 
 _Platform Configurations_
-- `hz_name`: Hosting Zone on which to pre-pend subdomains for individual services (Example: `667873832206.accounts.gentrack.io`)
-- `cert_arn`: Wildcard SSL certificate to associate with ALB ingress parths (Example: `arn:aws:acm:ap-southeast-2:667873832206:certificate/88fbdb44-26d4-4c8b-ae48-470dfd2ea8f8`) 
-- `create_iam`: True/False flag to trigger creation of IAM Users for Jenkins Master, Jenkins Slave and a sample deployment role
-- `jenkins_master_policy`: IAM Policy to be attached to Jenkins Master User
-- `assumable_roles`:  List of role ARNs that can be assumed by the Jenkins Slave IAM User
-- `deployment_role_policy`:  IAM Policy to be attached to the sample deployment role
 
-- `stack_defs`: list of maps describing one or more VPC definitions
+- `hz_name`: SSM Parameter key (e.g. `/jenkins/dns/prd-zone-name`) holding the Hosted Zone name on which to pre-pend subdomains for individual services (Example: `jenkins.gentrack.io`)
+- `cert_arn`: SSM Parameter key (e.g. `/jenkins/cert/production-wildc-cert-arn`) holding the Wildcard SSL certificate ARM to associate with ALB ingress parths (Example: `arn:aws:acm:ap-southeast-2:405711654092:certificate/cb3e519e-d305-4b81-ba9f-dbb6cc1d52d4`) 
+- `whitelist_ips`: a list of IPs (e.g. `101.98.162.108/32`) to be whitelisted for HTTPS access to the stack URL
+- `stack_defs`: list of maps describing one or more Stack definitions
 
-VPC definition data structure:
+Stack definition data structure:
 
 {
 
+- `app_type`: free-form token to indicate stack application (currently `jenkins` and `nexus` are used)
 - `name`: prefix/suffix to include in Names and Tags
 - `cidr`: VPC CIDR range
-
 - `azs`: list of AZs to deploy into
 - `private_subnets`: list of private subnet CIDR ranges (can be empty set)
 - `public_subnets`: list of public subnet CIDR ranges (can be empty set)
-
 - `enable_nat_gateway`: create NAT gateway for private subnets (true/false)
 - `single_nat_gateway`: create single NAT gateway for all AZs (true/false)
 - `one_nat_gateway_per_az`: set to false if the above is true
-
-- `access_point`: directory path for Access Point
-
+  
 - `docker_image`: image to deploy as Fargate task within ECS
+- `command`: list of srtings to pass to the Docker run command after the image (equivalent to `CMD`)
 - `app_ports`: ports utilized by application
 - `subdomains`: subdomains to associate with app ports (match order in port list)
-- `health_check_path`: path for load balancer health check
-- `container_mount`: path within container to mount EFS
 - `port_mappings`: application to container port mappings
+- `health_check_path`: path for load balancer health check
+- `access_point`: directory path for Access Point
+- `container_mount`: path within container to mount EFS
 - `port_tg`: ALB listener rules mapping port to target group
+
+- `create_iam`: True/False flag to indicate creation of IAM Users for Jenkins Master, Jenkins Slave and a sample deployment role
+- `iam_components`: 
+
+    - `stack_env`: modifier to generate unique names for IAM components (e.g. `dev`)
+    - `jenkins_master_policy`: path to JSON file with properly formatted IAM Policy definition to attach to Jenkins Master IAM User (e.g. `/JDEV/Jenkins-Master-IAM-Policy.json`)
+    - `deployment_role_policy`: path to JSON file with property formatted IAM Policy definition to attach to the Terraform Assumeable Role in the current acocunt (e.g. `/JDEV/Deployment-Role-Policy.json`)
+
+- `assumable_roles`: list of Role ARNs that can be Assumed by the Jenkins Slave Agent (typically in other accounts)
 
 }
 
 - `peering_pairs`: map of tuples in the form `name = [ from_vpc_indx, to_vpc_indx ]` _Note: can be empty set if no VPC Peering connections required_
 
-_Example:_
+_Examples of Jenkins and Nexus Configuration:_
 
 ```
 stack_defs = [ 
-  {
-      # JENKINS DEV VPC and APP
-      name = "jdev"
-      cidr = "10.16.3.0/24"
+    {
+        # JENKINS DEV APP STACK
+        app_type = "jenkins"
+        name = "jdev"
+        cidr = "10.16.3.0/24"
 
-      azs             = ["ap-southeast-2a", "ap-southeast-2b"]
-      private_subnets = ["10.16.3.0/27", "10.16.3.32/27"]
-      public_subnets  = ["10.16.3.128/27", "10.16.3.160/27"]
+        azs             = ["ap-southeast-2a", "ap-southeast-2b"]
+        private_subnets = ["10.16.3.0/27", "10.16.3.32/27"]
+        public_subnets  = ["10.16.3.128/27", "10.16.3.160/27"]
 
-      enable_nat_gateway = true
-      single_nat_gateway = true
-      one_nat_gateway_per_az = false
+        enable_nat_gateway = true
+        single_nat_gateway = true
+        one_nat_gateway_per_az = false
 
-      access_point = "/efs/jenkins_dev"
+        access_point = "/efs/jenkins_dev"
 
-      docker_image = "jenkins/jenkins:2.400-jdk11"
-      app_ports = [ 8080 ]
-      subdomains = [ "jenkinsdev" ]
-      health_check_path = "/login"
-      container_mount = "/var/jenkins_home"
-      port_mappings = [
-          {
-          containerPort = 8080
-          hostPort      = 8080
-          }
-      ]
-      port_tg = {
-          8080 = 0
-      }
+        docker_image = "jenkins/jenkins:2.406-jdk11"
+        command = [
+            "--accessLoggerClassName=winstone.accesslog.SimpleAccessLogger",
+            "--simpleAccessLogger.format=combined",
+            "--simpleAccessLogger.file=/var/jenkins_home/logs/access.log",
+        ]
+        app_ports = [ 8080 ]
+        subdomains = [ "dev" ]
+        health_check_path = "/login"
+        container_mount = "/var/jenkins_home"
+        port_mappings = [
+            {
+            containerPort = 8080
+            hostPort      = 8080
+            },
+            {
+            containerPort = 50000
+            hostPort      = 50000
+            }            
+        ]
+        port_tg = {
+            8080 = 0
+        }
 
-  },
-  {
-      # NEXUS VPC and APP
-      name = "nxs"        
-      cidr = "10.16.4.0/24"
+        # IAM Components
+        create_iam    = true
+        iam_components = {
+            stack_env              = "dev"
+            jenkins_master_policy  = "/JDEV/Jenkins-Master-IAM-Policy.json"
+            deployment_role_policy = "/JDEV/Deployment-Role-Policy.json"
+        }
+        # List of Role ARNs that can be Assumed by the Jenkins Slave Agent (typically in other accounts)
+        assumable_roles        = [ "arn:aws:iam::667873832206:role/OrganizationAccountAccessRole" ]
 
-      azs             = ["ap-southeast-2b", "ap-southeast-2c"]
-      private_subnets = []
-      public_subnets  = ["10.16.4.128/27", "10.16.4.160/27"]
+    },
+     {
+        # NEXUS APP STACK
+        app_type = "nexus"
+        name = "nxs"        
+        cidr = "10.16.4.0/24"
 
-      enable_nat_gateway = false 
-      single_nat_gateway = false 
-      one_nat_gateway_per_az = false
+        azs             = ["ap-southeast-2b", "ap-southeast-2c"]
+        private_subnets = ["10.16.4.0/27", "10.16.4.32/27"]
+        public_subnets  = ["10.16.4.128/27", "10.16.4.160/27"]
 
-      access_point = "/efs/nexus"
+        enable_nat_gateway = true 
+        single_nat_gateway = true 
+        one_nat_gateway_per_az = false
 
-      docker_image = "sonatype/nexus3:latest"
-      app_ports = [ 8081, 8082 ]
-      subdomains = [ "nexus", "docker" ]
-      health_check_path = "/service/rest/v1/status" 
-      container_mount = "/opt/sonatype/sonatype-work/nexus3"
-      port_mappings = [
-          {
-          containerPort = 8081
-          hostPort      = 8081
-          },
-          {
-          containerPort = 8082
-          hostPort      = 8082
-          }            
-      ]
-      port_tg = {
-          8081 = 0
-          8082 = 1
-      }
- 
-  }
+        access_point = "/efs/nexus"
+
+        docker_image = "sonatype/nexus3:latest"
+        app_ports = [ 8081, 8082 ]
+        subdomains = [ "nexus", "docker" ]
+        health_check_path = "/service/rest/v1/status" 
+        container_mount = "/opt/sonatype/sonatype-work/nexus3"
+        port_mappings = [
+            {
+            containerPort = 8081
+            hostPort      = 8081
+            },
+            {
+            containerPort = 8082
+            hostPort      = 8082
+            }            
+        ]
+        port_tg = {
+            8081 = 0
+            8082 = 1
+        }
+
+        # IAM Components
+        create_iam      = false
+        iam_components  = {}
+        assumable_roles = []   
+    }, 
 ]
 
 peering_pairs = {
     jdev_to_nexus = [0, 1]
 }
 ```
+
+**IAM Policy Definitions**
+
+IAM Policy definitons are saved to individual files for re-use and ease of editing.  File references in `jenkins_master_policy` and `deployment_role_policy` are relative to `path.root` so they can be anywhere within the directory tree.  _Note: by convention these files use the `.json` suffix._
 
 ## Usage
 
@@ -182,12 +221,12 @@ Where:
    * Target AWS Account == DEV|PRD, etc.
 ```
 
-Example of complete deploy sequence:
+Example of complete deploy sequence for Jenkins DEV:
 
 ```
-   ./tf-run init DEV
-   ./tf-run plan DEV
-   ./tf-run apply DEV
+   ./tf-run init JDEV
+   ./tf-run plan JDEV
+   ./tf-run apply JDEV
 ```
 
 # Appendix

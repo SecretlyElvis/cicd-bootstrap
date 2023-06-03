@@ -18,6 +18,7 @@ environment   = "prd"
 # List of IPs to Whitelist for Load Balancer Ingress
 whitelist_ips = [
     "101.98.162.108/32", # TEMP: Dan's Home Office
+    "125.239.144.52/32", # TEMP: Andrew's Home Office
 ]
 
 ###################################

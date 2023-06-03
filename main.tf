@@ -135,6 +135,7 @@ module "app-standup" {
 
   # ECS
   docker_image = var.stack_defs[count.index].docker_image
+  command = try(var.stack_defs[count.index].command, [])
   app_ports = var.stack_defs[count.index].app_ports
   container_mount = var.stack_defs[count.index].container_mount
   port_mappings = var.stack_defs[count.index].port_mappings

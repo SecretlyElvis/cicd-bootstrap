@@ -59,6 +59,7 @@ resource "aws_ecs_task_definition" "task-def" {
       cpu       = 2048
       memory    = 4096
       essential = true
+      command = var.command
       portMappings = var.port_mappings
       mountPoints = [
         {

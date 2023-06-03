@@ -3,6 +3,12 @@ variable "docker_image" {
   type = string
 }
 
+variable "command" {
+  description = "Command-line Arguments to Pass to 'docker run' Post Image Name (equivalent to 'CML')"
+  type = list(string)
+  default = []
+}
+
 variable "app_ports" {
   description = "Host/Container Ports for ALB Target Groups"
   type = list

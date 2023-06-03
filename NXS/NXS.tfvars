@@ -41,7 +41,7 @@ stack_defs = [
 
         access_point = "/efs/nexus"
 
-        docker_image = "sonatype/nexus3:latest"
+        docker_image = "sonatype/nexus3:3.54.1"
         app_ports = [ 8081, 8082 ]
         subdomains = [ "nexus", "docker" ]
         health_check_path = "/service/rest/v1/status" 
