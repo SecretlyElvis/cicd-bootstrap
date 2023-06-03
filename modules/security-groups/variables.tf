@@ -24,6 +24,12 @@ variable "whitelist_ips" {
   type = list
 }
 
+variable "nat_ips" {
+  description = "Public IPs Assigned to NAT Gateway EIP for Application Stack"
+  type = list
+  default = []
+}
+
 variable "shortname" {
   description = "Distinct Identifier for Fargate Application"
   type = string

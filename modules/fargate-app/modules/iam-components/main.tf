@@ -1,13 +1,12 @@
 #########################################################
 ## IAM User for Jenkins Master (Slave Standup Privileges)
-
 resource "aws_iam_user" "jenkins-master-user" {
-  name = join("-", [ var.basename, "jenkins", "master", "user" ])
+  name = join("_", [ var.basename, "jenkins", "aws", var.stack_env, "agent" ])
   force_destroy = true
 
   tags = merge(
       tomap({
-              "Name" = join("-", [ var.basename, "jenkins", "master", "user" ])
+              "Name" = join("_", [ var.basename, "jenkins", "aws", var.stack_env, "agent" ])
           }),
       var.common_tags
   ) 
@@ -17,19 +16,18 @@ resource "aws_iam_user_policy" "jenkins-master-policy" {
   name   = join("-", [ var.basename, "jenkins", "master", "policy" ])
 
   user   = aws_iam_user.jenkins-master-user.name
-  policy = var.jenkins_master_policy
+  policy = file("${path.root}${var.jenkins_master_policy}")
 }
 
 ######################################################
 ## IAM User For Jenkins Slave (Assume Role Privileges)
-
 resource "aws_iam_user" "jenkins-slave-user" {
-  name = join("-", [ var.basename, "jenkins", "slave", "user" ])
+  name = join("_", [ var.basename, "jenkins", "aws", var.stack_env, "deploy" ])
   force_destroy = true
 
   tags = merge(
       tomap({
-              "Name" = join("-", [ var.basename, "jenkins", "slave", "user" ])
+              "Name" = join("_", [ var.basename, "jenkins", "aws", var.stack_env, "deploy" ])
           }),
       var.common_tags
   ) 
@@ -53,9 +51,8 @@ resource "aws_iam_user_policy" "jenkins-slave-policy" {
 
 ########################
 ## Sample Assumable Role
-
 resource "aws_iam_role" "cicd-account-assumable-role" {
-  name = join("-", [ var.basename, "jenkins", "deployment", "role" ])
+  name = join("_", [ var.basename, "jenkins", var.stack_env, "deployment", "role" ])
 
   assume_role_policy = <<EOF
 {
@@ -74,16 +71,16 @@ EOF
 
   tags = merge(
       tomap({
-              "Name" = join("-", [ var.basename, "jenkins", "deployment", "role" ])
+              "Name" = join("_", [ var.basename, "jenkins", var.stack_env, "deployment", "role" ])
           }),
       var.common_tags
   )   
 }
 
 resource "aws_iam_policy" "assumable-role-policy" {
-  name = join("-", [ var.basename, "jenkins", "deployment", "policy" ])
+  name = join("_", [ var.basename, "jenkins", var.stack_env, "deployment", "policy" ])
 
-  policy = var.deployment_role_policy
+  policy = file("${path.root}${var.deployment_role_policy}")
 
 }
 

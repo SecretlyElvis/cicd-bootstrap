@@ -29,6 +29,24 @@ variable "health_check_path" {
   type = string
 }
 
+variable "create_iam" {
+  description = "Boolean Flag Whether to Create IAM Components ('true' for Jenkins Stacks)"
+  type = bool
+  default = false
+}
+
+variable "iam_components" {
+  description = "Eleemnts Used for Creating IAM Users and Roles For Jenkins"
+  type = map(string)
+  default = {}
+}
+
+variable "assumable_roles" {
+  description = "List of Role ARNs in Other Accounts that can be Assumed by Jenkins Slave Agents"
+  type = list 
+  default = []
+}
+
 variable "file_system_id" {
   description = "EFS Filesystem to Mount to Fargate Application"
   type = string

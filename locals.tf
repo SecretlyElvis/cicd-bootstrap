@@ -35,8 +35,12 @@ locals {
     }   
   ]
 
-  # The List Below is for Corporate IPs to be Allowed Access to the Platform
-  corporate_ips = []
+  # The ip's below are allowed through the firewall to access the Velocity Application
+  corporate_ips = [
+    "203.167.214.160/32", # Auckland office
+    "81.108.106.54/32",  # Gentrack Euston Office
+    "31.24.220.131/32",  # Gentrack Tewksbury Office
+  ]
   whitelist_ips = concat(local.corporate_ips, var.whitelist_ips)
 }
 

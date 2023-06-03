@@ -97,6 +97,7 @@ module "sg-defs" {
   vpc_cidr = var.stack_defs[count.index].cidr 
   app_ports = var.stack_defs[count.index].app_ports
   whitelist_ips = local.whitelist_ips
+  nat_ips = module.vpc-standup[count.index].nat_public_ips
 
   app_type = var.stack_defs[count.index].app_type
   shortname = var.stack_defs[count.index].name
@@ -142,6 +143,11 @@ module "app-standup" {
   private_subnets = module.vpc-standup[count.index].private_subnets
   ecs_sg_id = module.sg-defs[count.index].ecs_sg_id
 
+  # IAM
+  create_iam      = var.stack_defs[count.index].create_iam
+  iam_components  = var.stack_defs[count.index].iam_components
+  assumable_roles = var.stack_defs[count.index].assumable_roles
+
   # EFS
   file_system_id = module.efs-standup[count.index].file_system_id
   access_point_id = module.efs-standup[count.index].access_point_id
@@ -160,24 +166,5 @@ module "app-standup" {
   common_tags = local.common_tags
   basename = join("-", [ local.basename, var.stack_defs[count.index].name ])
   shortname = var.stack_defs[count.index].name
-
-}
-
-#######################################################################################
-## Create IAM Elements for Jenkins (Instance Profile, IAM User for Slave Agent Standup)
-## Note; TF doesn't suppert 'if-then-else' so this is the poor man's version
-
-module "iam-standup" {
-
-  source = "./modules/iam-elements"
-  
-  count = var.create_iam ? 1 : 0
-
-  assumable_roles = var.assumable_roles
-  deployment_role_policy = var.deployment_role_policy
-  jenkins_master_policy = var.jenkins_master_policy
-  
-  common_tags = local.common_tags
-  basename = local.basename
 
 }

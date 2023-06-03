@@ -6,6 +6,12 @@ variable "create_iam" {
     default = false
 }
 
+variable "stack_env" {
+  description = "Identifier for Stack Type (e.g. 'dev', 'prd') for Use in IAM User NAme"
+  type = string
+  default = ""
+}
+
 variable "assumable_roles" {
     description = "List of Roles in Other Accounts that Can Be Assumed by EC2 Slave Agent Insance Profile"
     type = list(string)
@@ -13,12 +19,12 @@ variable "assumable_roles" {
 }
 
 variable "deployment_role_policy" {
-    description = "Policy for Sample Assumable Role in Same Account as CI/CD Platform"
+    description = "File Containing Policy for Sample Assumable Role in Same Account as CI/CD Platform"
     type = string
 }
 
 variable "jenkins_master_policy" {
-  description = "Policy for Jenkins Master Host to Stand Up Slave EC2 Agents"
+  description = "File Containing Policy for Jenkins Master Host to Stand Up Slave EC2 Agents"
   type = string
 }
 

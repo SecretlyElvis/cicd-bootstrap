@@ -1,3 +1,14 @@
+############################
+## Parameter Store Variables
+
+data "aws_ssm_parameter" "hz_name" {
+  name = var.hz_name
+}
+ 
+data "aws_ssm_parameter" "cert_arn" {
+  name = var.cert_arn
+}
+
 ##############
 ## ECS Cluster
 
@@ -185,7 +196,7 @@ resource "aws_lb_listener" "alb-listener-def" {
   port              = "443"
   protocol          = "HTTPS"
   ssl_policy        = "ELBSecurityPolicy-2016-08"
-  certificate_arn   = var.cert_arn
+  certificate_arn   = data.aws_ssm_parameter.cert_arn.value
 
   default_action {
     type             = "forward"
@@ -235,7 +246,7 @@ resource "aws_lb_listener" "redirect-listener" {
 ## Route 53 Elements
 
 data "aws_route53_zone" "target-zone" {
-  name         = var.hz_name
+  name         = data.aws_ssm_parameter.hz_name.value
   private_zone = false
 }
 
@@ -244,7 +255,7 @@ resource "aws_route53_record" "subdomain" {
   count = length(var.subdomains)
 
   zone_id = data.aws_route53_zone.target-zone.zone_id
-  name    = join(".", [ var.subdomains[count.index], var.hz_name ])
+  name    = join(".", [ var.subdomains[count.index], data.aws_ssm_parameter.hz_name.value ])
   type    = "A"
 #  ttl     = "300"
 
@@ -253,4 +264,24 @@ resource "aws_route53_record" "subdomain" {
     zone_id                = aws_lb.alb-def.zone_id
     evaluate_target_health = false
   }
+}
+
+#######################################################################################
+## Create IAM Elements for Jenkins (Instance Profile, IAM User for Slave Agent Standup)
+## Note; TF doesn't suppert 'if-then-else' so this is the poor man's version
+
+module "iam-standup" {
+
+  source = "./modules/iam-components"
+  
+  count = var.create_iam ? 1 : 0
+
+  stack_env = try(var.iam_components["stack_env"],"")
+  assumable_roles = var.assumable_roles
+  deployment_role_policy = try(var.iam_components["deployment_role_policy"],"")
+  jenkins_master_policy = try(var.iam_components["jenkins_master_policy"],"")
+  
+  common_tags = var.common_tags
+  basename = var.basename
+
 }

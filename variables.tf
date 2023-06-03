@@ -73,16 +73,6 @@ variable "assumable_roles" {
     default = []
 }
 
-variable "deployment_role_policy" {
-    description = "Policy for Sample Assumable Role in Same Account as CI/CD Platform"
-    type = string
-}
-
-variable "jenkins_master_policy" {
-    description = "IAM Policy for Jenkins Master Fargate Task to Stand Up Slave Agents"
-    type = string
-}
-
 ## Common Tags for All Infrastructure Components
 variable "common_tags" {
   description = "Common tags applied to all the resources created in this module"
