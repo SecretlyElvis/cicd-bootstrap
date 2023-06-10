@@ -6,13 +6,13 @@
 ## ALB: Application Load Balancer
 
 resource "aws_security_group" "alb" {
-  name        = join("-", [ var.basename, "${var.shortname}_ALB", "sg" ])
+  name        = join("-", [ var.basename, "ALB", "sg" ])
   description = "ECS/Fargate Security Group - ${var.shortname}"
   vpc_id      = var.vpc_id
 
   tags = merge(
       tomap({
-              "Name" = join("-", [ var.basename, "${var.shortname}_ALB", "sg" ])
+              "Name" = join("-", [ var.basename, "ALB", "sg" ])
           }),
       var.common_tags
   )
@@ -28,6 +28,19 @@ resource "aws_vpc_security_group_ingress_rule" "alb-ingress-nat" {
   from_port   = 443
   ip_protocol = "tcp"
   to_port     = 443
+  depends_on = [aws_security_group.alb]
+}
+
+# ALB Ingress: 80 from Whitelist IPs (redurects to 443)
+resource "aws_vpc_security_group_ingress_rule" "alb-ingress-http" {
+  
+  count = length(var.whitelist_ips)
+
+  security_group_id = aws_security_group.alb.id
+  cidr_ipv4   = var.whitelist_ips[count.index]
+  from_port   = 80
+  ip_protocol = "tcp"
+  to_port     = 80
   depends_on = [aws_security_group.alb]
 }
 
@@ -63,13 +76,13 @@ resource "aws_vpc_security_group_egress_rule" "alb-egress-app" {
 ## EFS: Elastic File System Backend Security Group
 
 resource "aws_security_group" "efs" {
-  name        = join("-", [ var.basename, "${var.shortname}_EFS", "sg" ])
+  name        = join("-", [ var.basename, "EFS", "sg" ])
   description = "EFS Security Group - ${var.shortname}"
   vpc_id      = var.vpc_id
 
   tags = merge(
       tomap({
-              "Name" = join("-", [ var.basename, "${var.shortname}_EFS", "sg" ])
+              "Name" = join("-", [ var.basename, "EFS", "sg" ])
           }),
       var.common_tags
   )
@@ -103,13 +116,13 @@ resource "aws_vpc_security_group_egress_rule" "efs-egress-nfs" {
 ## ECS Service / Fargate Security Group
 
 resource "aws_security_group" "ecs" {
-  name        = join("-", [ var.basename, "${var.shortname}_ECS", "sg" ])
+  name        = join("-", [ var.basename, "ECS", "sg" ])
   description = "ECS/Fargate Security Group - ${var.shortname}"
   vpc_id      = var.vpc_id
 
   tags = merge(
       tomap({
-              "Name" = join("-", [ var.basename, "${var.shortname}_ECS", "sg" ])
+              "Name" = join("-", [ var.basename, "ECS", "sg" ])
           }),
       var.common_tags
   )
@@ -198,13 +211,13 @@ resource "aws_security_group" "slv" {
 
   count = (var.app_type == "jenkins") ? 1 : 0
 
-  name        = join("-", [ var.basename, "${var.shortname}_SLV", "sg" ])
+  name        = join("-", [ var.basename, "SLV", "sg" ])
   description = "EC2 Jenkins Slave Security Group - ${var.shortname}"
   vpc_id      = var.vpc_id
 
   tags = merge(
       tomap({
-              "Name" = join("-", [ var.basename, "${var.shortname}_SLV", "sg" ])
+              "Name" = join("-", [ var.basename, "SLV", "sg" ])
           }),
       var.common_tags
   )

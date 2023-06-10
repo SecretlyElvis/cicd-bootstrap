@@ -16,7 +16,7 @@ if [ $PLAN_FILE ]; then
    echo "Found existing PLAN file: '${PLAN_FILE}'.\n"
 else
    PID=$$
-   PLAN_FILE="./peo-${PID}.plan"
+   PLAN_FILE="./cicd-${PID}.plan"
 fi
 
 # Uncomment the following lines to enable debugging

@@ -96,7 +96,7 @@ module "sg-defs" {
   vpc_id = module.vpc-standup[count.index].vpc_id
   vpc_cidr = var.stack_defs[count.index].cidr 
   app_ports = var.stack_defs[count.index].app_ports
-  whitelist_ips = local.whitelist_ips
+  whitelist_ips = concat(local.corporate_ips, var.stack_defs[count.index].whitelist_ips)
   nat_ips = module.vpc-standup[count.index].nat_public_ips
 
   app_type = var.stack_defs[count.index].app_type

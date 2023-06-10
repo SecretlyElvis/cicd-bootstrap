@@ -1,28 +1,19 @@
 # Role to assume for execution of infrastructure actions
-role_arn = "arn:aws:iam::405711654092:role/OrganizationAccountAccessRole"
+role_arn = "arn:aws:iam::339285943866:role/Terraform-Bootstrap"
 
 # Default Region
 region = "ap-southeast-2"
 
 # SSM Parameter for Hosted Zone Name
-hz_name = "/jenkins/dns/prd-zone-name"
+hz_name = "/jenkins/dns/neural-zone-name"
 
 # SSM Parameter for Wildcard Certificate ARN
-cert_arn = "/jenkins/cert/production-wildc-cert-arn"
+cert_arn = "/jenkins/cert/neural-wildc-cert-arn"
 
 # Naming Components
 application   = "cicd"                     
-tenant        = "peo"                     
-environment   = "prd"
-
-# List of IPs to Whitelist for Load Balancer Ingress
-whitelist_ips = [
-    "101.98.162.108/32", # TEMP: Dan's Home Office
-    "125.239.144.52/32", # TEMP: Andrew's Home Office
-]
-
-###################################
-## Stack Configuration: Jenkins DEV
+tenant        = "nrl"                     
+environment   = "demo"
 
 stack_defs = [ 
     {
@@ -41,9 +32,12 @@ stack_defs = [
 
         access_point = "/efs/jenkins_dev"
 
-        docker_image = "jenkins/jenkins:2.406-jdk11"
+        # List of IPs to Whitelist for Load Balancer Ingress
+        whitelist_ips = []
+
+        docker_image = "jenkins/jenkins:2.409-jdk11"
         app_ports = [ 8080 ]
-        subdomains = [ "dev" ]
+        subdomains = [ "jdev" ]
         health_check_path = "/login"
         container_mount = "/var/jenkins_home"
         port_mappings = [
@@ -68,7 +62,7 @@ stack_defs = [
             deployment_role_policy = "/JDEV/Deployment-Role-Policy.json"
         }
         # List of Role ARNs that can be Assumed by the Jenkins Slave Agent (typically in other accounts)
-        assumable_roles        = [ "arn:aws:iam::667873832206:role/OrganizationAccountAccessRole" ]
+        assumable_roles        = [ "arn:aws:iam::339285943866:role/TF-Deploy" ]
 
     },  
 ]

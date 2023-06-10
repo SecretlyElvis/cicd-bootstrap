@@ -4,9 +4,9 @@ locals {
     application           = var.application                     
     tenant                = var.tenant                     
     environment           = var.environment 
-    technical_owner       = "andrewn@gentrack.com"             
-    business_owner        = "andrewn@gentrack.com"             
-    customer_owner        = "andrewn@gentrack.com"
+    technical_owner       = "auldd@neuralessence.com"             
+    business_owner        = "auldd@neuralessence.com"             
+    customer_owner        = "auldd@neuralessence.com"
 
   }
   common_tags = merge(local.default_common_tags, var.common_tags)
@@ -37,10 +37,7 @@ locals {
 
   # The ip's below are allowed through the firewall to access the Velocity Application
   corporate_ips = [
-    "203.167.214.160/32", # Auckland office
-    "81.108.106.54/32",  # Gentrack Euston Office
-    "31.24.220.131/32",  # Gentrack Tewksbury Office
+    "101.98.162.108/32", # Dan's Home Office
   ]
-  whitelist_ips = concat(local.corporate_ips, var.whitelist_ips)
 }
 

@@ -1,25 +1,19 @@
 # Role to assume for execution of infrastructure actions
-role_arn = "arn:aws:iam::405711654092:role/OrganizationAccountAccessRole"
+role_arn = "arn:aws:iam::339285943866:role/Terraform-Bootstrap"
 
 # Default Region
 region = "ap-southeast-2"
 
 # SSM Parameter for Hosted Zone Name
-hz_name = "/jenkins/dns/prd-zone-name"
+hz_name = "/jenkins/dns/neural-zone-name"
 
 # SSM Parameter for Wildcard Certificate ARN
-cert_arn = "/jenkins/cert/production-wildc-cert-arn"
+cert_arn = "/jenkins/cert/neural-wildc-cert-arn"
 
 # Naming Components
 application   = "cicd"                     
-tenant        = "peo"                     
-environment   = "prd"
-
-# List of IPs to Whitelist for Load Balancer Ingress
-whitelist_ips = [
-    "54.206.253.253/32", # Jenkins DEV NAT Gateway EIP
-    "101.98.162.108/32", # TEMP: Dan's Home Office
-]
+tenant        = "nrl"                     
+environment   = "demo"
 
 ###################################
 ## Stack Configuration: Jenkins DEV
@@ -41,7 +35,10 @@ stack_defs = [
 
         access_point = "/efs/nexus"
 
-        docker_image = "sonatype/nexus3:3.54.1"
+        # List of IPs to Whitelist for Load Balancer Ingress
+        whitelist_ips = []
+
+        docker_image = "sonatype/nexus3:3.55.0"
         app_ports = [ 8081, 8082 ]
         subdomains = [ "nexus", "docker" ]
         health_check_path = "/service/rest/v1/status" 

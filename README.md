@@ -28,26 +28,25 @@ The prefix for each filename must match the directory.  Example filenames:
 _Example:_
 
 ```
-bucket = "tools-405711654092-tf-state"
+bucket = "neuralessence-tfstate"
 key = "jenkins/Jenkins-DEV-Stack.tfstate"
-dynamodb_table = "tools-405711654092-tf-lock-table"
+dynamodb_table = "neuralessence_tflock"
 region = "ap-southeast-2"
-role_arn = "arn:aws:iam::405711654092:role/OrganizationAccountAccessRole"
+role_arn = "arn:aws:iam::339285943866:role/Terraform-Bootstrap"
 ```
 
 **JDEV.tfvars**
 
 _Name/Tag Tokens:_
 
-- `tenant`: Example: `peo`
+- `tenant`: Example: `nrl`
 - `application`:  Example: `cicd`
-- `environment`: Example: `prd`
+- `environment`: Example: `demo`
 
 _Platform Configurations_
 
-- `hz_name`: SSM Parameter key (e.g. `/jenkins/dns/prd-zone-name`) holding the Hosted Zone name on which to pre-pend subdomains for individual services (Example: `jenkins.gentrack.io`)
-- `cert_arn`: SSM Parameter key (e.g. `/jenkins/cert/production-wildc-cert-arn`) holding the Wildcard SSL certificate ARM to associate with ALB ingress parths (Example: `arn:aws:acm:ap-southeast-2:405711654092:certificate/cb3e519e-d305-4b81-ba9f-dbb6cc1d52d4`) 
-- `whitelist_ips`: a list of IPs (e.g. `101.98.162.108/32`) to be whitelisted for HTTPS access to the stack URL
+- `hz_name`: SSM Parameter key (e.g. `/jenkins/dns/neural-zone-name`) holding the Hosted Zone name on which to pre-pend subdomains for individual services (Example: `jenkins.neuralessence.com`)
+- `cert_arn`: SSM Parameter key (e.g. `/jenkins/cert/neural-wildc-cert-arn`) holding the Wildcard SSL certificate ARM to associate with ALB ingress parths (Example: `arn:aws:acm:ap-southeast-2:339285943866:certificate/6997e1d3-1ff5-4905-a38b-e4be3d46ba9b`) 
 - `stack_defs`: list of maps describing one or more Stack definitions
 
 Stack definition data structure:
@@ -64,6 +63,8 @@ Stack definition data structure:
 - `single_nat_gateway`: create single NAT gateway for all AZs (true/false)
 - `one_nat_gateway_per_az`: set to false if the above is true
   
+- `whitelist_ips`: a list of IPs (e.g. `101.98.162.108/32`) to be whitelisted for HTTPS access to the stack URL
+
 - `docker_image`: image to deploy as Fargate task within ECS
 - `command`: list of srtings to pass to the Docker run command after the image (equivalent to `CMD`)
 - `app_ports`: ports utilized by application
@@ -107,6 +108,9 @@ stack_defs = [
 
         access_point = "/efs/jenkins_dev"
 
+        # List of IPs to Whitelist for Load Balancer Ingress
+        whitelist_ips = []        
+
         docker_image = "jenkins/jenkins:2.406-jdk11"
         command = [
             "--accessLoggerClassName=winstone.accesslog.SimpleAccessLogger",
@@ -139,7 +143,7 @@ stack_defs = [
             deployment_role_policy = "/JDEV/Deployment-Role-Policy.json"
         }
         # List of Role ARNs that can be Assumed by the Jenkins Slave Agent (typically in other accounts)
-        assumable_roles        = [ "arn:aws:iam::667873832206:role/OrganizationAccountAccessRole" ]
+        assumable_roles        = [ "arn:aws:iam::339285943866:role/Terraform-Bootstrap" ]
 
     },
      {
@@ -157,6 +161,9 @@ stack_defs = [
         one_nat_gateway_per_az = false
 
         access_point = "/efs/nexus"
+
+        # List of IPs to Whitelist for Load Balancer Ingress
+        whitelist_ips = []
 
         docker_image = "sonatype/nexus3:latest"
         app_ports = [ 8081, 8082 ]
