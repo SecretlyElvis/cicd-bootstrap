@@ -35,7 +35,7 @@ stack_defs = [
         # List of IPs to Whitelist for Load Balancer Ingress
         whitelist_ips = []
 
-        docker_image = "jenkins/jenkins:2.409-jdk11"
+        docker_image = "jenkins/jenkins:2.410-jdk11"
         app_ports = [ 8080 ]
         subdomains = [ "jdev" ]
         health_check_path = "/login"
