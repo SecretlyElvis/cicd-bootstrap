@@ -12,7 +12,7 @@ task_role_policy = "/iam_policies/Task-DockerExec-Policy.json"
 ```
 
 2. Install the AWS CLI locally
-3. Install the session_manager_plugin with the following (for Linux):
+3. Install the Session Manager Plugin with the following (for Linux):
 
 `sudo yum install -y https://s3.amazonaws.com/session-manager-downloads/plugin/latest/linux_64bit/session-manager-plugin.rpm`
 

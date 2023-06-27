@@ -145,6 +145,8 @@ stack_defs = [
         # List of Role ARNs that can be Assumed by the Jenkins Slave Agent (typically in other accounts)
         assumable_roles        = [ "arn:aws:iam::339285943866:role/Terraform-Bootstrap" ]
 
+        task_role = true
+        task_role_policy = "/iam_policies/Task-DockerExec-Policy.json"
     },
      {
         # NEXUS APP STACK
@@ -189,6 +191,9 @@ stack_defs = [
         create_iam      = false
         iam_components  = {}
         assumable_roles = []   
+
+        task_role = true
+        task_role_policy = "/iam_policies/Task-DockerExec-Policy.json"
     }, 
 ]
 
