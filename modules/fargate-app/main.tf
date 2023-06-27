@@ -133,11 +133,6 @@ resource "aws_ecs_service" "service-def" {
   )
 }
 
-################################################
-## Security Groups for Application Load Balancer
-
-# TODO
-
 #################
 ## ALB Components
 
@@ -205,7 +200,8 @@ resource "aws_lb_listener" "alb-listener-def" {
   }
 }
 
-# Add listener rules to forward subdomians to associaed target groups
+## Add listener rules to forward subdomians to associaed target groups
+
 resource "aws_lb_listener_rule" "static" {
 
   count = length(var.subdomains)
@@ -225,7 +221,7 @@ resource "aws_lb_listener_rule" "static" {
   }
 }
 
-# add additional 'listener_rule' to route 'docker*' to alternate target group
+## Default rule to redirect HTTP to HTTPS (if poert 80 is accessible in the SG)
 
 resource "aws_lb_listener" "redirect-listener" {
   load_balancer_arn = aws_lb.alb-def.arn
