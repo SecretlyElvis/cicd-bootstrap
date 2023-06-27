@@ -62,6 +62,9 @@ stack_defs = [
         create_iam      = false
         iam_components  = {}
         assumable_roles = []   
+
+        task_role = true
+        task_role_policy = "/iam_policies/Task-DockerExec-Policy.json"
     },  
 ]
 

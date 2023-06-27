@@ -40,13 +40,56 @@ resource "aws_ecs_cluster_capacity_providers" "cap-prv-def" {
   }
 }
 
-#######################################
-## Fargate Task Definition (with mount)
-# taskRoleArn = var.task_role ? aws_iam_role.fargate-task-role[0].arn : ""
+####################
+## Fargate Task Role
 
+resource "aws_iam_role" "fargate-task-role" {
+
+  count = var.task_role ? 1 : 0
+
+  name = join("-", [ var.basename, "task", "role", "fg" ])
+
+  assume_role_policy = <<ARTP
+{
+  "Version": "2012-10-17",
+  "Statement": [
+    {
+      "Sid": "ECSFargateTaskRole",
+      "Effect": "Allow",
+      "Principal": {
+        "Service": [
+          "ecs-tasks.amazonaws.com"
+        ]
+      },
+      "Action": "sts:AssumeRole"
+    }
+  ]
+}
+ARTP
+}
+
+resource "aws_iam_policy" "fargate-task-policy" {
+
+  count = var.task_role ? 1 : 0
+
+  name = join("-", [ var.basename, "task", "policy", "fg" ])
+  policy = file("${path.root}${var.task_role_policy}")
+}
+
+resource "aws_iam_role_policy_attachment" "fargate-task-role-policy-attachment" {
+
+  count = var.task_role ? 1 : 0
+
+  role       = "${aws_iam_role.fargate-task-role[0].name}"
+  policy_arn = "${aws_iam_policy.fargate-task-policy[0].arn}"
+}
+
+###################################################
+## Fargate Task Definition (with EFS  volume mount)
 
 resource "aws_ecs_task_definition" "task-def" {
   family                   = var.shortname
+  task_role_arn            = var.task_role ? aws_iam_role.fargate-task-role[0].arn : ""
   requires_compatibilities = ["FARGATE"]
   network_mode             = "awsvpc"
   cpu                      = 2048
@@ -105,6 +148,7 @@ resource "aws_ecs_service" "service-def" {
   name            = join("-", [ var.basename, "svc" ])
   cluster         = aws_ecs_cluster.cluster-def.id
   task_definition = aws_ecs_task_definition.task-def.arn
+  enable_execute_command = var.task_role
   desired_count   = 1
 #  iam_role        = var.role_arn
 #  depends_on      = [aws_iam_role_policy.foo]

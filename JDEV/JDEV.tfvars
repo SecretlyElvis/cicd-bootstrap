@@ -58,12 +58,14 @@ stack_defs = [
         create_iam    = true
         iam_components = {
             stack_env              = "dev"
-            jenkins_master_policy  = "/JDEV/Jenkins-Master-IAM-Policy.json"
-            deployment_role_policy = "/JDEV/Deployment-Role-Policy.json"
+            jenkins_master_policy  = "/iam_policies/Jenkins-Master-IAM-Policy.json"
+            deployment_role_policy = "/iam_policies/Deployment-Role-Policy.json"
         }
         # List of Role ARNs that can be Assumed by the Jenkins Slave Agent (typically in other accounts)
         assumable_roles        = [ "arn:aws:iam::339285943866:role/TF-Deploy" ]
 
+        task_role = true
+        task_role_policy = "/iam_policies/Task-DockerExec-Policy.json"
     },  
 ]
 

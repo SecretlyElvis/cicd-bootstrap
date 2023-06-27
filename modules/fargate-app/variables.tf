@@ -53,6 +53,18 @@ variable "assumable_roles" {
   default = []
 }
 
+variable "task_role" {
+  description = "Flag to determine whether to create/attach a Task Role for Fargate"
+  type = bool
+  default = false
+}
+
+variable "task_role_policy" {
+  description = "Policy for Fargate Task Role -- Can Be Used to Enable Docker Exec into the Container"
+  type = string
+  default = ""
+}
+
 variable "file_system_id" {
   description = "EFS Filesystem to Mount to Fargate Application"
   type = string

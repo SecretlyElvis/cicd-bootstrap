@@ -148,6 +148,8 @@ module "app-standup" {
   create_iam      = var.stack_defs[count.index].create_iam
   iam_components  = var.stack_defs[count.index].iam_components
   assumable_roles = var.stack_defs[count.index].assumable_roles
+  task_role = try(var.stack_defs[count.index].task_role, false)
+  task_role_policy = try(var.stack_defs[count.index].task_role_policy, "")
 
   # EFS
   file_system_id = module.efs-standup[count.index].file_system_id
