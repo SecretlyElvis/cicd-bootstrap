@@ -27,9 +27,15 @@ pipeline {
                     accessKeyVariable: 'ACCESS_KEY',
                     secretKeyVariable: 'SECRET_KEY'
                 ]]) {
+                    sh "aws configure set aws_access_key_id $ACCESS_KEY"
+                    sh "aws configure set aws_secret_access_key $SECRET_KEY"
+                    sh "aws configure set default.region ap-southeast-2"
+
                     checkout scm
 
                     sh '''
+                    rm -rf .terrafor*
+
                     ./tf-run init DIRECT
 
                     ./tf-run plan DIRECT
