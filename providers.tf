@@ -19,6 +19,7 @@ terraform {
 
 provider "aws" {
   region = var.region
+}
 
 # In this branch I'm testing whether direct AWS config (rather than assuming role) will work
 #  assume_role {
@@ -26,4 +27,3 @@ provider "aws" {
 #    session_name = "SESSION_NAME"
 #    external_id  = "EXTERNAL_ID"
 #  }
-}
