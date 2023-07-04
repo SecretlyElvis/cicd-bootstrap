@@ -1,5 +1,14 @@
+def state_list = ["apply","destroy"]
+
 pipeline {
-    
+
+    parameters {
+        choice (name: 'final_tf_cmd',
+            choices: state_list,
+            description: 'The Final Terraform Command After init/plan'
+        )
+    }
+
     agent { label 'Local' }
 
     stages {
@@ -25,7 +34,7 @@ pipeline {
 
                     ./tf-run plan DIRECT
 
-                    
+                    ./tf-run ''' + params.final_tf_cmd + ''' DIRECT
                     '''
                 }
             }
