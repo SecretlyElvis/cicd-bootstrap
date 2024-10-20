@@ -7,6 +7,7 @@ variable "region" {
 variable "role_arn" {
   description = "AWS region the resources will be deployed to"
   type = string
+  default = "ReplaceWithValidRole"
 }
 
 ## VPC Configuration

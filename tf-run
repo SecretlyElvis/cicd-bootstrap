@@ -11,13 +11,7 @@ CMD=${1:---help}
 ENV=${2:-MVP}
 
 # Use/overwrite existing "*.plan" file if any, otherwise generate
-PLAN_FILE=$(find . -name "*.plan" | head -n 1)
-if [ $PLAN_FILE ]; then
-   echo "Found existing PLAN file: '${PLAN_FILE}'.\n"
-else
-   PID=$$
-   PLAN_FILE="./cicd-${PID}.plan"
-fi
+PLAN_FILE="cicd-plan.plan"
 
 # Uncomment the following lines to enable debugging
 # export TF_LOG=DEBUG
@@ -44,11 +38,11 @@ echo ""
 
 case $CMD in
     init)
-	terraform init -input=false -backend=true -var-file=./$ENV/$ENV.tfvars -backend-config=./$ENV/$ENV-backend.tfvars
+	terraform init -input=false -backend=true -var-file=./env/$ENV/$ENV.tfvars -backend-config=./env/$ENV/$ENV-backend.tfvars
         ;;
 
     plan)
-	terraform plan -var-file=./$ENV/$ENV.tfvars -out=$PLAN_FILE
+	terraform plan -var-file=./env/$ENV/$ENV.tfvars -out=$PLAN_FILE
 	;;
 
     apply)
@@ -57,7 +51,7 @@ case $CMD in
 	;;
 
     destroy)
-	terraform destroy -auto-approve -var-file=./$ENV/$ENV.tfvars
+	terraform destroy -auto-approve -var-file=./env/$ENV/$ENV.tfvars
     echo "Deleting plan files..."
 	rm -v ./*.plan
     echo "Complete."
